@@ -1,23 +1,24 @@
 import mysql.connector
 
-yhteys = mysql.connector.connect(
-         host='127.0.0.1',
-         port= 3306,
-         database='flight_game',
-         user='nalle',
-         password='sup3rS!!st1',
-         autocommit=True
-         )
+connection = mysql.connector.connect(
+    host='127.0.0.1',
+    port= 3306,
+    database='flight_game',
+    user='nalle',
+    password='sup3rS!!st1',
+    autocommit=True
+)
 
 icao_code = input("Enter the ICAO code of an airport: ").upper()
-sql = f'SELECT name, municipality FROM airport WHERE ident = "{icao_code}"'
-kursori = yhteys.cursor()
-kursori.execute(sql)
-tulos = kursori.fetchall()
+sql = f'SELECT name, municipality FROM airport WHERE ident = %s'
 
-if kursori.rowcount == 1:
-    for rivi in tulos:
-        print(f"Airport name: {rivi[0]}")
-        print(f"Location: {rivi[1]}")
-else:
+cursor = connection.cursor()
+cursor.execute(sql, (icao_code,))
+result = cursor.fetchall()
+
+if not result:
     print(f"No airport found with ICAO code {icao_code}")
+else:
+    for row in result:
+        print(f"Airport name: {row[0]}")
+        print(f"Location: {row[1]}")
